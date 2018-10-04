@@ -12,8 +12,8 @@ A script to classify RNA PTM profile data , and test it.
 ### Dependencies
 
 - Numpy
-- Matplotlit
-- Sklearn
+- Matplotlib
+- Scikit Learn
 - Pandas
 
 
@@ -34,7 +34,7 @@ python \dir\to\script\PTM_classifier.py -ARGS
 ## Built With
 
 * [Scikit-Learn](https://github.com/scikit-learn/scikit-learn)
-* [Salmonela] - (https://github.com/mehravehs/Salmonella) - Influenced by
+* [Salmonela](https://github.com/mehravehs/Salmonella) - Influenced by
 
 ## License
 
