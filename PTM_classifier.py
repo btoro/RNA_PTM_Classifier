@@ -97,8 +97,13 @@ def perform_plot_LOO(  ):
     plt.figure()
 
 
-    arr1inds = labels_train.argsort()
-    labels_train_sorted = labels_train.sort_values(ascending=False)
+    arr1inds = y_train.argsort()
+    
+    labels_train_temp = labels_train.reset_index(drop=True);
+
+
+
+    labels_train_sorted = labels_train_temp[arr1inds[::-1]]
     
 
     prob_loo = class_probs[arr1inds[::-1]]
@@ -153,7 +158,7 @@ def perform_plot_LOO(  ):
 
     
     
-    outputFile = exportDir + '\\precision_recall'
+    outputFile = exportDir + '\\precision_recall_training'
     plt.savefig( outputFile + ".png", dpi=120)
     
     
@@ -214,7 +219,7 @@ def featureImportance( ):
 
     df2.plot(kind='barh', colormap='jet', legend=False)
     
-    outputFile = exportDir + '\\feature_importance'
+    outputFile = exportDir + '\\feature_importance_training'
     
     plt.tight_layout()
     
@@ -232,6 +237,10 @@ def featureImportance( ):
     ## Two most important Features
     if len(imp_features) > 2:
         from matplotlib.lines import Line2D
+        
+        if args.blk:
+            plt.style.use('dark_background')
+
 
         plt.figure()
         plt.tight_layout()
@@ -252,7 +261,7 @@ def featureImportance( ):
             
         plt.legend(handles=legend_elements, loc='best')
 
-        outputFile = exportDir + '\\firstsec_features'
+        outputFile = exportDir + '\\firstsec_features_training'
         plt.savefig( outputFile + ".png", dpi=120)
         
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -264,6 +273,8 @@ def featureImportance( ):
             
     ## Three most important Features
     if len(imp_features) > 3:
+        
+        from mpl_toolkits.mplot3d import Axes3D
         from matplotlib.lines import Line2D
         
         fig= plt.figure()
@@ -290,7 +301,7 @@ def featureImportance( ):
             
         plt.legend(handles=legend_elements, loc='best')
 
-        outputFile = exportDir + '\\firstsecthird_features'
+        outputFile = exportDir + '\\firstsecthird_features_training'
         plt.savefig( outputFile + ".png", dpi=120)
         
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -359,7 +370,7 @@ def perform_plot_Testing( ):
     plt.figure(figsize=(15,8))
     plot_confusion_matrix(cnf_matrix, normalize=True, classes=categories)
     
-    outputFile = exportDir + '\\confusion_matrix'
+    outputFile = exportDir + '\\confusion_matrix_testing'
     plt.savefig( outputFile + ".png", dpi=120)
     
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -536,16 +547,18 @@ def compare_Estimators():
     plt.ylabel( 'Mean accuracy' )
     plt.tight_layout()
     
+    
+    
     outputFile = 'compare_classifiers_accuracy'
     
     
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=500)
     
      #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=500)
         
     
 def compare_Estimators_fscore():            
@@ -610,16 +623,18 @@ def compare_Estimators_fscore():
                             Patch(facecolor='black', alpha=0.25, label='F-score', hatch="//") ]
         plt.legend(handles=legend_elements, loc='best')
         
-    outputFile = 'compare_classifiers_fscore'
+        
+    outputFile = exportDir + '\\compare_classifiers_fscore'
 
 
-    plt.savefig( outputFile + ".png", dpi=120)
+
+    plt.savefig( outputFile + ".png", dpi=500)
     
      #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=500)
     
 ## Gradient boosting regularization
 ##http://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regularization.html#sphx-glr-auto-examples-ensemble-plot-gradient-boosting-regularization-py
@@ -671,7 +686,7 @@ def perform_Regularization( ):
 #    df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=500)
 #    fig = plt.figure()
 #    
 #    X_test=np.asmatrix(X_test)
@@ -708,7 +723,7 @@ def plot_EucledianDistance():
     plt.figure()
     
     
-    results = euclidean_distances( X, y)
+    results = euclidean_distances( X, X)
     
     n, m = X.shape
         
@@ -724,20 +739,20 @@ def plot_EucledianDistance():
     plt.colorbar()
  
     outputFile = exportDir + '\\eucledian_distances'
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=500)
     
     df = pd.DataFrame( results , index=sampleNames , columns=sampleNames)    
     df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=500)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RNA PTM Classifer script')
 
     parser.add_argument( '-training', metavar='Training file', help="Specify path to training dataset", required=True)
     
-    parser.add_argument( '-testing', metavar='Testing file', help="Specify path to testing dataset")
+#    parser.add_argument( '-testing', metavar='Testing file', help="Specify path to testing dataset")
     parser.add_argument( '-output', metavar='Output directory', help="Specify output directory")
     parser.add_argument( '-loo', help="Perform leave one out analysis", action='store_true')
     parser.add_argument( '-eucledian', help="Create eucledian distance matrix", action='store_true')
@@ -750,19 +765,33 @@ if __name__ == "__main__":
     parser.add_argument( '-compare_classifiers',  help="Compares some basic classification estimators", action='store_true')
     parser.add_argument( '-classifier',  help="Select classifier to use")
     parser.add_argument( '-test',  help="Perform testing", action='store_true')
+    parser.add_argument( '-blk',  help="Exports figures with black background color scheme", action='store_true')
     
     args = parser.parse_args()
-    
-    
+    import sys, os
+
+
     ### Deals with the output for all files
     if args.output:
-        exportDir = args.output        
+        exportDir = os.getcwd() + '//' + args.output        
     else:
-        import os
         exportDir = os.getcwd()
         
     print("Will export all outputs to %s." % exportDir)
 
+
+
+    ##Output command as command.txt for future references
+
+    runcmd = " ".join(sys.argv)
+    
+    file = open( exportDir+ "//command.txt","w") 
+    file.write( runcmd   ) 
+    file.close() 
+    
+    
+    
+    
     ## Should i export files in EPS format?
     if args.eps:
         exportEPS = 1
@@ -788,6 +817,8 @@ if __name__ == "__main__":
     else:
         RS = None
         
+    if args.blk:
+        plt.style.use('dark_background')
         
     ## Pick classifier
     if args.classifier == 'gradient':
