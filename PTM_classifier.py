@@ -121,14 +121,14 @@ def perform_plot_LOO(  ):
     plt.tight_layout()
     
     outputFile = exportDir + '\\class_probs_leave_one_out'
-    plt.savefig( outputFile + ".png", dpi=500)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
 #    np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     df = pd.DataFrame( prob_loo, index=labels_train[0:n_samples ], columns=categories )    
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
         
 
     ## Precision and Recall 
@@ -151,15 +151,17 @@ def perform_plot_LOO(  ):
     
     from matplotlib.patches import Patch
     
-    legend_elements = [ Patch(facecolor='black', label='Precision'),
-                        Patch(facecolor='black', alpha=0.5, label='Recall') ]
+       
+    legend_elements = [ Patch(facecolor=fc, label='Precision'),
+                        Patch(facecolor=fc, alpha=0.5, label='Recall') ]
+    
     plt.legend(handles=legend_elements, loc='best')
     
 
     
     
     outputFile = exportDir + '\\precision_recall_training'
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     
     data = {'Precision': precision, 'Recall': recall }
@@ -167,7 +169,7 @@ def perform_plot_LOO(  ):
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
                 
        
           
@@ -226,13 +228,13 @@ def featureImportance( ):
     plt.xlabel('Relative Importance')
     plt.ylabel('')
 
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
 #    np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
         
     ## Two most important Features
     if len(imp_features) > 2:
@@ -262,13 +264,13 @@ def featureImportance( ):
         plt.legend(handles=legend_elements, loc='best')
 
         outputFile = exportDir + '\\firstsec_features_training'
-        plt.savefig( outputFile + ".png", dpi=120)
+        plt.savefig( outputFile + ".png", dpi=dpi_all)
         
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
         if exportEPS:
-            plt.savefig( outputFile + ".eps", dpi=120)
+            plt.savefig( outputFile + ".eps", dpi=dpi_all)
             
             
     ## Three most important Features
@@ -302,13 +304,13 @@ def featureImportance( ):
         plt.legend(handles=legend_elements, loc='best')
 
         outputFile = exportDir + '\\firstsecthird_features_training'
-        plt.savefig( outputFile + ".png", dpi=120)
+        plt.savefig( outputFile + ".png", dpi=dpi_all)
         
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
         if exportEPS:
-            plt.savefig( outputFile + ".eps", dpi=120)
+            plt.savefig( outputFile + ".eps", dpi=dpi_all)
     
 
 #%%
@@ -350,13 +352,13 @@ def perform_plot_Testing( ):
         fig.tight_layout()
 
     outputFile = exportDir + '\\testing_plots'
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
 #    df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
 
 
     ## Confusion matrix
@@ -371,13 +373,13 @@ def perform_plot_Testing( ):
     plot_confusion_matrix(cnf_matrix, normalize=True, classes=categories)
     
     outputFile = exportDir + '\\confusion_matrix_testing'
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
 #    df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
     
     ## Precision and Recall 
     precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred)
@@ -399,8 +401,8 @@ def perform_plot_Testing( ):
     
     from matplotlib.patches import Patch
     
-    legend_elements = [ Patch(facecolor='black', label='Precision'),
-                        Patch(facecolor='black', alpha=0.5, label='Recall') ]
+    legend_elements = [ Patch(facecolor=fc, label='Precision'),
+                        Patch(facecolor=fc, alpha=0.5, label='Recall') ]
     plt.legend(handles=legend_elements, loc='best')
     
     ax = plt.gca()
@@ -412,7 +414,7 @@ def perform_plot_Testing( ):
     plt.tight_layout()
 
     outputFile = exportDir + '\\precision_recall_testing'
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
 
     
@@ -421,7 +423,7 @@ def perform_plot_Testing( ):
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=120)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
         
         
     if args.classifier == 'kneighbors':
@@ -471,10 +473,10 @@ def perform_plot_Testing( ):
     
     
             outputFile = exportDir + '\\firstsec_features_testing'
-            plt.savefig( outputFile + ".png", dpi=120)
+            plt.savefig( outputFile + ".png", dpi=dpi_all)
             
             if exportEPS:
-                plt.savefig( outputFile + ".eps", dpi=300)
+                plt.savefig( outputFile + ".eps", dpi=dpi_all)
 
     
     
@@ -552,13 +554,13 @@ def compare_Estimators():
     outputFile = 'compare_classifiers_accuracy'
     
     
-    plt.savefig( outputFile + ".png", dpi=500)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
      #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=500)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
         
     
 def compare_Estimators_fscore():            
@@ -618,9 +620,9 @@ def compare_Estimators_fscore():
         
         from matplotlib.patches import Patch
         
-        legend_elements = [ Patch(facecolor='black', label='Precision'),
-                            Patch(facecolor='black', alpha=0.6, label='Recall'),
-                            Patch(facecolor='black', alpha=0.25, label='F-score', hatch="//") ]
+        legend_elements = [ Patch(facecolor=fc, label='Precision'),
+                            Patch(facecolor=fc, alpha=0.6, label='Recall'),
+                            Patch(facecolor=fc, alpha=0.25, label='F-score', hatch="//") ]
         plt.legend(handles=legend_elements, loc='best')
         
         
@@ -628,13 +630,13 @@ def compare_Estimators_fscore():
 
 
 
-    plt.savefig( outputFile + ".png", dpi=500)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
      #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=500)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
     
 ## Gradient boosting regularization
 ##http://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regularization.html#sphx-glr-auto-examples-ensemble-plot-gradient-boosting-regularization-py
@@ -680,13 +682,13 @@ def perform_Regularization( ):
     plt.ylabel('Test Set Deviance')
     
     outputFile = exportDir + '\\training_deviance'
-    plt.savefig( outputFile + ".png", dpi=120)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
 #    df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=500)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
 #    fig = plt.figure()
 #    
 #    X_test=np.asmatrix(X_test)
@@ -739,13 +741,13 @@ def plot_EucledianDistance():
     plt.colorbar()
  
     outputFile = exportDir + '\\eucledian_distances'
-    plt.savefig( outputFile + ".png", dpi=500)
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     df = pd.DataFrame( results , index=sampleNames , columns=sampleNames)    
     df.to_csv(outputFile + ".csv", index=True, sep=',')
 
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=500)
+        plt.savefig( outputFile + ".eps", dpi=dpi_all)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RNA PTM Classifer script')
@@ -790,7 +792,7 @@ if __name__ == "__main__":
     file.close() 
     
     
-    
+    dpi_all = 500
     
     ## Should i export files in EPS format?
     if args.eps:
@@ -817,8 +819,11 @@ if __name__ == "__main__":
     else:
         RS = None
         
+        
+    fc = 'black' ## face color for plot legends
     if args.blk:
         plt.style.use('dark_background')
+        fc = 'white'
         
     ## Pick classifier
     if args.classifier == 'gradient':
