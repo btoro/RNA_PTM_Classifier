@@ -139,8 +139,8 @@ def perform_plot_LOO(  ):
     bar_width = 0.35
     
     for i in range(num_categories):
-        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab10(i) )
-        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab10(i) )
+        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab20(i) )
+        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab20(i) )
 #    
 #    plt.bar( np.arange(num_categories)-w/2, recall, width=w, align='center' )
 #    plt.bar( np.arange(num_categories)+w/2, precision , width=w, align='center', color='blue', alpha=0.7 )
@@ -250,7 +250,7 @@ def featureImportance( ):
         featureIDX = np.argsort(imp_features)
                     
         for i in range( n_samples):
-            plt.plot( X_train[i, featureIDX[-1] ], X_train[i, featureIDX[-2] ], 'o', color=plt.cm.tab10( y_train[i]-1))
+            plt.plot( X_train[i, featureIDX[-1] ], X_train[i, featureIDX[-2] ], 'o', color=plt.cm.tab20( y_train[i]-1))
     
         plt.xlabel( "Most important PTM (%s) (AVP)"  % feature_labels[featureIDX[-1]])
         plt.ylabel( "Second most important PTM (%s) (AVP)" % feature_labels[featureIDX[-2]])
@@ -259,7 +259,7 @@ def featureImportance( ):
         
         legend_elements =[]
         for i in range( num_categories ):
-            legend_elements.append( Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab10(i), label=categories[i]) )
+            legend_elements.append( Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab20(i), label=categories[i]) )
             
         plt.legend(handles=legend_elements, loc='best')
 
@@ -289,7 +289,7 @@ def featureImportance( ):
  
 
         for i in range( n_samples):
-            ax.scatter( X_train[i, featureIDX[-1] ], X_train[i, featureIDX[-2] ], X_train[i, featureIDX[-3] ], 'o', c=plt.cm.tab10( y_train[i]-1))
+            ax.scatter( X_train[i, featureIDX[-1] ], X_train[i, featureIDX[-2] ], X_train[i, featureIDX[-3] ], 'o', c=plt.cm.tab20( y_train[i]-1))
     
         ax.set_xlabel( "1st PTM (%s) (AVP)"  % feature_labels[featureIDX[-1]])
         ax.set_ylabel( "2nd PTM (%s) (AVP)" % feature_labels[featureIDX[-2]])
@@ -299,7 +299,7 @@ def featureImportance( ):
         
         legend_elements =[]
         for i in range(0, num_categories ):
-            legend_elements.append( Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab10(i), label=categories[i]) )
+            legend_elements.append( Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab20(i), label=categories[i]) )
             
         plt.legend(handles=legend_elements, loc='best')
 
@@ -335,22 +335,23 @@ def perform_plot_Testing( ):
     fig, axs = plt.subplots(rows, columns, figsize=(15, rows*3) )
 
     axs = axs.ravel()
+    fsize = 12
 
     for i, sample in enumerate(results):
                 
         axs[i].bar( np.arange( num_categories ), sample )
         axs[i].set_xticks( np.arange( num_categories )  )
-        axs[i].set_xticklabels( categories , rotation=90   )
-        
+        axs[i].set_xticklabels( categories , rotation=90 , fontsize=fsize, fontweight='bold'  )
         axs[i].set_xlabel( '' )
-        axs[i].set_ylabel( 'Probability' )
+        axs[i].set_ylabel( 'Probability' , fontsize=fsize, fontweight='bold'  )
         for bar in axs[i].patches:
             bar.set_facecolor('red')
 
         axs[i].patches[y_test[i]-1].set_facecolor('green')
 
-        fig.tight_layout()
 
+
+    fig.tight_layout()
     outputFile = exportDir + '\\testing_plots'
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
@@ -390,8 +391,8 @@ def perform_plot_Testing( ):
     bar_width = 0.35
     
     for i in range(num_categories):
-        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab10(i) )
-        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab10(i) )
+        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab20(i) )
+        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab20(i) )
 #    
 #    plt.bar( np.arange(num_categories)-w/2, recall, width=w, align='center' )
 #    plt.bar( np.arange(num_categories)+w/2, precision , width=w, align='center', color='blue', alpha=0.7 )
@@ -439,11 +440,11 @@ def perform_plot_Testing( ):
             featureIDX = np.argsort(imp_features)
             
             for i in range( n_samples):
-                plt.plot( X_train[i, featureIDX[-1] ], X_train[i, featureIDX[-2] ], 'o', color=plt.cm.tab10( y_train[i]-1),
+                plt.plot( X_train[i, featureIDX[-1] ], X_train[i, featureIDX[-2] ], 'o', color=plt.cm.tab20( y_train[i]-1),
                        markeredgecolor ='k', alpha=0.8)
                 
             for i in range( n_test_samples):
-                plt.plot( X_test[i, featureIDX[-1] ], X_test[i, featureIDX[-2] ], '*', color=plt.cm.tab10( y_test[i]-1),
+                plt.plot( X_test[i, featureIDX[-1] ], X_test[i, featureIDX[-2] ], '*', color=plt.cm.tab20( y_test[i]-1),
                        markeredgecolor ='k', alpha=1, markersize=12 )
                 
                 
@@ -467,7 +468,7 @@ def perform_plot_Testing( ):
             
             legend_elements =[]
             for i in range( num_categories ):
-                legend_elements.append( Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab10(i), label=categories[i]) )
+                legend_elements.append( Line2D([0], [0], marker='o', color='w', markerfacecolor=plt.cm.tab20(i), label=categories[i]) )
                 
             plt.legend(handles=legend_elements, loc='best')
     
@@ -501,7 +502,7 @@ def plot_confusion_matrix(cm, classes,
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
+    plt.xticks(tick_marks, classes, rotation=90)
     plt.yticks(tick_marks, classes)
 
     fmt = '.2f' if normalize else 'd'
@@ -575,7 +576,7 @@ def compare_Estimators_fscore():
         (KNeighborsClassifier( 3 )),
         (GradientBoostingClassifier(n_estimators=200, random_state=RS, learning_rate = 0.05))]
     
-    names = ['LinearSVC', 'KNeighborsClassifier', 'GradientBosstingClassifier']
+    names = ['Linear SVC', 'K-Nearest Neighbors Classifier', 'Gradient Boosting Classifier']
     
     columns = 3
     fig, axs = plt.subplots(1, columns, figsize=(12, 6) )
@@ -602,9 +603,9 @@ def compare_Estimators_fscore():
         bar_width = 0.3
         
         for c in range(num_categories):
-            axs[i].bar( index[c], precision[c], bar_width, alpha=1, color=plt.cm.tab10(i) )
-            axs[i].bar( index[c]+bar_width, recall[c], bar_width, alpha=0.6, color=plt.cm.tab10(i) )
-            axs[i].bar( index[c]+bar_width+bar_width, fscore[c], bar_width, alpha=0.25, color=plt.cm.tab10(i), hatch="//", edgecolor=plt.cm.tab10(i) )
+            axs[i].bar( index[c], precision[c], bar_width, alpha=1, color=plt.cm.tab20(i) )
+            axs[i].bar( index[c]+bar_width, recall[c], bar_width, alpha=0.6, color=plt.cm.tab20(i) )
+            axs[i].bar( index[c]+bar_width+bar_width, fscore[c], bar_width, alpha=0.25, color=plt.cm.tab20(i), hatch="//", edgecolor=plt.cm.tab20(i) )
  
                 
         axs[i].set_xticks(np.arange(num_categories)+bar_width  )
