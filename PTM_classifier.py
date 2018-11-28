@@ -155,7 +155,7 @@ def perform_plot_LOO(  ):
     legend_elements = [ Patch(facecolor=fc, label='Precision'),
                         Patch(facecolor=fc, alpha=0.5, label='Recall') ]
     
-    plt.legend(handles=legend_elements, loc='best')
+    plt.legend(handles=legend_elements, loc='lower right')
     
 
     
@@ -404,14 +404,15 @@ def perform_plot_Testing( ):
     
     legend_elements = [ Patch(facecolor=fc, label='Precision'),
                         Patch(facecolor=fc, alpha=0.5, label='Recall') ]
-    plt.legend(handles=legend_elements, loc='best')
+    plt.legend(handles=legend_elements, loc='lower right')
     
     ax = plt.gca()
 
-    ax.text(0.95, 0.9, ('%.2f' % score).lstrip('0'), size=15,
-                bbox=dict(boxstyle='round', alpha=0.8, facecolor='white'),
-                transform=ax.transAxes, horizontalalignment='right')
-    
+#    ax.text(0.95, 1.05, ('Accuracy: %.2f' % score).lstrip('0'), size=12,
+#                bbox=dict(boxstyle='round', alpha=0.8, facecolor='white'),
+#                transform=ax.transAxes, horizontalalignment='right')
+    ax.set_title( 'Accuracy: '+str( round(score,2) ) )
+
     plt.tight_layout()
 
     outputFile = exportDir + '\\precision_recall_testing'
@@ -605,7 +606,7 @@ def compare_Estimators_fscore():
         for c in range(num_categories):
             axs[i].bar( index[c], precision[c], bar_width, alpha=1, color=plt.cm.tab20(i) )
             axs[i].bar( index[c]+bar_width, recall[c], bar_width, alpha=0.6, color=plt.cm.tab20(i) )
-            axs[i].bar( index[c]+bar_width+bar_width, fscore[c], bar_width, alpha=0.25, color=plt.cm.tab20(i), hatch="//", edgecolor=plt.cm.tab20(i) )
+            ##axs[i].bar( index[c]+bar_width+bar_width, fscore[c], bar_width, alpha=0.25, color=plt.cm.tab20(i), hatch="//", edgecolor=plt.cm.tab20(i) )
  
                 
         axs[i].set_xticks(np.arange(num_categories)+bar_width  )
@@ -615,16 +616,19 @@ def compare_Estimators_fscore():
         axs[i].set_xlabel( '' )
         axs[i].set_ylabel( 'Score' )
 
-        axs[i].set_title( names[i]+' | Accuracy: '+str( round(accuracy,2) ) )
+        axs[i].set_title( names[i]+ r"$\bf{" + ' | Accuracy: '+ str( round(accuracy,2) ) + "}$" )
+        
+        
+         
     
         plt.tight_layout()
         
         from matplotlib.patches import Patch
         
         legend_elements = [ Patch(facecolor=fc, label='Precision'),
-                            Patch(facecolor=fc, alpha=0.6, label='Recall'),
-                            Patch(facecolor=fc, alpha=0.25, label='F-score', hatch="//") ]
-        plt.legend(handles=legend_elements, loc='best')
+                            Patch(facecolor=fc, alpha=0.6, label='Recall'), ]
+                            #Patch(facecolor=fc, alpha=0.25, label='F-score', hatch="//") ]
+        plt.legend(handles=legend_elements, loc='lower right')
         
         
     outputFile = exportDir + '\\compare_classifiers_fscore'
