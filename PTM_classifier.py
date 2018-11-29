@@ -127,8 +127,8 @@ def perform_plot_LOO(  ):
     df = pd.DataFrame( prob_loo, index=labels_train[0:n_samples ], columns=categories )    
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
 
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
         
 
     ## PRECISION RECALL PLOT
@@ -142,7 +142,7 @@ def perform_plot_LOO(  ):
     df = pd.DataFrame( data , index=categories )    
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
     
-    if exportEPS:
+    if exportPDF:
         plt.savefig( outputFile + ".pdf", dpi=dpi_all)
                 
        
@@ -237,8 +237,8 @@ def featureImportance( ):
 #    np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     df.to_csv(outputFile + ".csv", index=True, sep=',')
 
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
         
     ## Two most important Features
     if len(imp_features) > 2:
@@ -273,8 +273,8 @@ def featureImportance( ):
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
-        if exportEPS:
-            plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        if exportPDF:
+            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
             
             
     ## Three most important Features
@@ -313,8 +313,8 @@ def featureImportance( ):
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
-        if exportEPS:
-            plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        if exportPDF:
+            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
     
 
 #%%
@@ -368,8 +368,8 @@ def perform_plot_Testing( ):
     outputFile = exportDir + '\\testing_plots'
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
         
     
     ########################
@@ -400,8 +400,8 @@ def perform_plot_Testing( ):
         outputFile = exportDir + '\\testing_plot_incorrect'
         plt.savefig( outputFile + ".png", dpi=dpi_all)
         
-        if exportEPS:
-            plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        if exportPDF:
+            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
 
 
     ########################
@@ -432,8 +432,8 @@ def perform_plot_Testing( ):
         outputFile = exportDir + '\\testing_plot_correct'
         plt.savefig( outputFile + ".png", dpi=dpi_all)
         
-        if exportEPS:
-            plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        if exportPDF:
+            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
             
             
     ########################
@@ -452,8 +452,8 @@ def perform_plot_Testing( ):
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
     
     
     ########################
@@ -471,7 +471,7 @@ def perform_plot_Testing( ):
     df = pd.DataFrame( data , index=categories )    
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
     
-    if exportEPS:
+    if exportPDF:
         plt.savefig( outputFile + ".pdf", dpi=dpi_all)
         
         
@@ -524,8 +524,8 @@ def perform_plot_Testing( ):
             outputFile = exportDir + '\\firstsec_features_testing'
             plt.savefig( outputFile + ".png", dpi=dpi_all)
             
-            if exportEPS:
-                plt.savefig( outputFile + ".eps", dpi=dpi_all)
+            if exportPDF:
+                plt.savefig( outputFile + ".pdf", dpi=dpi_all)
 
     
     
@@ -608,8 +608,8 @@ def compare_Estimators():
      #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
         
     
 def compare_Estimators_fscore():            
@@ -623,7 +623,7 @@ def compare_Estimators_fscore():
         (KNeighborsClassifier( 3 )),
         (GradientBoostingClassifier(n_estimators=200, random_state=RS, learning_rate = 0.05))]
     
-    names = ['Linear SVC', 'K-Nearest Neighbors Classifier', 'Gradient Boosting Classifier']
+    names = ['Linear SVC', 'K-Nearest Neighbors', 'Gradient Boosting']
     
     columns = 3
     fig, axs = plt.subplots(1, columns, figsize=(12, 6) )
@@ -677,7 +677,7 @@ def compare_Estimators_fscore():
         plt.legend(handles=legend_elements, loc='lower right')
         
         
-    outputFile = exportDir + '\\compare_classifiers_fscore'
+    outputFile = exportDir + '\\compare_classifiers'
 
 
 
@@ -686,7 +686,7 @@ def compare_Estimators_fscore():
      #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
-    if exportEPS:
+    if exportPDF:
         plt.savefig( outputFile + ".pdf", dpi=dpi_all)
     
 ## Gradient boosting regularization
@@ -738,8 +738,8 @@ def perform_Regularization( ):
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
 #    df.to_csv(outputFile + ".csv", index=True, sep=',')
 
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
 #    fig = plt.figure()
 #    
 #    X_test=np.asmatrix(X_test)
@@ -797,8 +797,8 @@ def plot_EucledianDistance():
     df = pd.DataFrame( results , index=sampleNames , columns=sampleNames)    
     df.to_csv(outputFile + ".csv", index=True, sep=',')
 
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+    if exportPDF:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RNA PTM Classifer script')
@@ -811,7 +811,7 @@ if __name__ == "__main__":
     parser.add_argument( '-eucledian', help="Create eucledian distance matrix", action='store_true')
     parser.add_argument( '-features', help="Plot feature importance", action='store_true')
     parser.add_argument( '-all',  help="Performs all analysis included in script", action='store_true')
-    parser.add_argument( '-eps',  help="Exports all figures in EPS format for further editing", action='store_true')
+    parser.add_argument( '-pdf',  help="Exports all figures in PDF format for further editing", action='store_true')
     parser.add_argument( '-model',  help="Model testing plots", action='store_true')
     parser.add_argument( '-random_test',  type= float, help="Select random samples for testing ", required=True)
     parser.add_argument( '-random_state',  type=int, help="Select a random seed for reproducibility")
@@ -845,11 +845,11 @@ if __name__ == "__main__":
     
     dpi_all = 500
     
-    ## Should i export files in EPS format?
-    if args.eps:
-        exportEPS = 1
+    ## Should i export files in PDF format?
+    if args.pdf:
+        exportPDF = 1
     else:
-        exportEPS = 0
+        exportPDF = 0
 
     ## Data loading
     X, y, categories, sampleNames, feature_labels = dataloading( args.training)
@@ -895,12 +895,8 @@ if __name__ == "__main__":
     
     if args.test or args.all:
         perform_plot_Testing( )
-    
-#    if args.model:
-#        perform_Regularization ( )
-        
-    if args.compare_classifiers:
-#        compare_Estimators( )
+
+    if args.compare_classifiers or args.all:
         compare_Estimators_fscore( )
     
     
