@@ -120,7 +120,7 @@ def perform_plot_LOO(  ):
     plt.colorbar()
     plt.tight_layout()
     
-    outputFile = exportDir + '\\class_probs_leave_one_out'
+    outputFile = exportDir + '\\{0}_class_probs_leave_one_out'.format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
 #    np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -134,7 +134,7 @@ def perform_plot_LOO(  ):
     ## PRECISION RECALL PLOT
     plotPrecisionRecall( precision, recall, categories, accuracy )
     
-    outputFile = exportDir + '\\precision_recall_training'
+    outputFile = exportDir + '\\{0}_precision_recall_training'.format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     
@@ -225,7 +225,7 @@ def featureImportance( ):
 
     df2.plot(kind='barh', colormap='jet', legend=False)
     
-    outputFile = exportDir + '\\feature_importance_training'
+    outputFile = exportDir + '\\{0}_feature_importance_training'.format( fname )
     
     plt.tight_layout()
     
@@ -267,7 +267,7 @@ def featureImportance( ):
             
         plt.legend(handles=legend_elements, loc='best')
 
-        outputFile = exportDir + '\\firstsec_features_training'
+        outputFile = exportDir + '\\{0}_firstsec_features_training'.format( fname )
         plt.savefig( outputFile + ".png", dpi=dpi_all)
         
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -307,7 +307,7 @@ def featureImportance( ):
             
         plt.legend(handles=legend_elements, loc='best')
 
-        outputFile = exportDir + '\\firstsecthird_features_training'
+        outputFile = exportDir + '\\{0}_firstsecthird_features_training'.format( fname )
         plt.savefig( outputFile + ".png", dpi=dpi_all)
         
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -365,7 +365,7 @@ def perform_plot_Testing( ):
 
 
     fig.tight_layout()
-    outputFile = exportDir + '\\testing_plots'
+    outputFile = exportDir + '\\{0}_testing_plots'.format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     if exportPDF:
@@ -397,7 +397,7 @@ def perform_plot_Testing( ):
     
     
         fig.tight_layout()
-        outputFile = exportDir + '\\testing_plot_incorrect'
+        outputFile = exportDir + '\\{0}_testing_plot_incorrect'.format( fname )
         plt.savefig( outputFile + ".png", dpi=dpi_all)
         
         if exportPDF:
@@ -429,7 +429,7 @@ def perform_plot_Testing( ):
     
     
         fig.tight_layout()
-        outputFile = exportDir + '\\testing_plot_correct'
+        outputFile = exportDir + '\\{0}_testing_plot_correct'.format( fname )
         plt.savefig( outputFile + ".png", dpi=dpi_all)
         
         if exportPDF:
@@ -448,7 +448,7 @@ def perform_plot_Testing( ):
     plt.figure(figsize=(15,8))
     plot_confusion_matrix(cnf_matrix, normalize=True, classes=categories)
     
-    outputFile = exportDir + '\\confusion_matrix_testing'
+    outputFile = exportDir + '\\{0}_confusion_matrix_testing'.format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     
@@ -462,7 +462,7 @@ def perform_plot_Testing( ):
     
     plotPrecisionRecall( precision, recall, categories, score )
 
-    outputFile = exportDir + '\\precision_recall_testing'
+    outputFile = exportDir + '\\{0}_precision_recall_testing'.format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
 
@@ -521,7 +521,7 @@ def perform_plot_Testing( ):
             plt.legend(handles=legend_elements, loc='best')
     
     
-            outputFile = exportDir + '\\firstsec_features_testing'
+            outputFile = exportDir + '\\{0}_firstsec_features_testing'.format( fname )
             plt.savefig( outputFile + ".png", dpi=dpi_all)
             
             if exportPDF:
@@ -600,7 +600,7 @@ def compare_Estimators():
     
     
     
-    outputFile = 'compare_classifiers_accuracy'
+    outputFile = '{0}_compare_classifiers_accuracy'.format( fname )
     
     
     plt.savefig( outputFile + ".png", dpi=dpi_all)
@@ -677,7 +677,7 @@ def compare_Estimators_fscore():
         plt.legend(handles=legend_elements, loc='lower right')
         
         
-    outputFile = exportDir + '\\compare_classifiers'
+    outputFile = exportDir + '\\{0}_compare_classifiers'.format( fname )
 
 
 
@@ -732,7 +732,7 @@ def perform_Regularization( ):
     plt.xlabel('Boosting Iterations')
     plt.ylabel('Test Set Deviance')
     
-    outputFile = exportDir + '\\training_deviance'
+    outputFile = exportDir + '\\{0}_training_deviance'.format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
  #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
@@ -791,7 +791,7 @@ def plot_EucledianDistance():
     ax.grid(color='w', linestyle='-', linewidth=0)
     plt.colorbar()
  
-    outputFile = exportDir + '\\eucledian_distances'
+    outputFile = exportDir + "\\{0}_eucledian_distances".format( fname )
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
     df = pd.DataFrame( results , index=sampleNames , columns=sampleNames)    
@@ -831,7 +831,11 @@ if __name__ == "__main__":
         exportDir = os.getcwd()
         
     print("Will export all outputs to %s." % exportDir)
-
+    
+    
+    fname = args.training.split('.')
+    fname = fname[0]
+    
 
 
     ##Output command as command.txt for future references
