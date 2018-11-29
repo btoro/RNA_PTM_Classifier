@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
  
 import pandas as pd
 
-from sklearn.metrics import precision_recall_fscore_support
 from sklearn.ensemble import GradientBoostingClassifier  #GBM algorithm 
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.model_selection import LeaveOneOut
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import precision_recall_fscore_support,accuracy_score
 
 import argparse
 
@@ -91,11 +91,11 @@ def perform_plot_LOO(  ):
         
 #    my_score = np.mean(y_pred==y_input)
     precision, recall, fscore, support = precision_recall_fscore_support(y_train, y_pred)
-    
+    accuracy = accuracy_score(y_train, y_pred)
+
     ## MAKE CLASS PROBABILITY PLOT
     
     plt.figure()
-
 
     arr1inds = y_train.argsort()
     
@@ -114,7 +114,7 @@ def perform_plot_LOO(  ):
      
     
     plt.yticks(np.arange(n_samples), labels_train_sorted[0:n_samples ], fontsize=2, rotation=0)
-    plt.xticks(np.arange( num_categories), categories, fontsize=8 , rotation=90)
+    plt.xticks(np.arange( num_categories), categories, fontsize=8 , rotation=45, ha='right')
     ax = plt.gca();
     ax.grid(color='w', linestyle='-', linewidth=0)
     plt.colorbar()
@@ -131,11 +131,27 @@ def perform_plot_LOO(  ):
         plt.savefig( outputFile + ".eps", dpi=dpi_all)
         
 
-    ## Precision and Recall 
+    ## PRECISION RECALL PLOT
+    plotPrecisionRecall( precision, recall, categories, accuracy )
     
+    outputFile = exportDir + '\\precision_recall_training'
+    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    
+    
+    data = {'Precision': precision, 'Recall': recall }
+    df = pd.DataFrame( data , index=categories )    
+    df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
+    
+    if exportEPS:
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+                
+       
+          
+
+def plotPrecisionRecall( precision, recall, categories, accuracy ):
     plt.figure()
  
-    index = np.arange( num_categories)
+    index = np.arange( len(categories) )
     bar_width = 0.35
     
     for i in range(num_categories):
@@ -145,7 +161,7 @@ def perform_plot_LOO(  ):
 #    plt.bar( np.arange(num_categories)-w/2, recall, width=w, align='center' )
 #    plt.bar( np.arange(num_categories)+w/2, precision , width=w, align='center', color='blue', alpha=0.7 )
     
-    plt.xticks(np.arange(num_categories)+bar_width/2, categories  , rotation=90)
+    plt.xticks(np.arange(num_categories)+bar_width/2, categories  , rotation=45, ha='right')
     plt.ylabel( 'Parameter Score' )
     plt.tight_layout()
     
@@ -157,24 +173,12 @@ def perform_plot_LOO(  ):
     
     plt.legend(handles=legend_elements, loc='lower right')
     
+    
+    ax = plt.gca()
+    ax.set_title( 'Accuracy: '+str( round(accuracy,2) ) )
+    
+    plt.tight_layout()
 
-    
-    
-    outputFile = exportDir + '\\precision_recall_training'
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
-    
-    
-    data = {'Precision': precision, 'Recall': recall }
-    df = pd.DataFrame( data , index=categories )    
-    df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
-    
-    if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
-                
-       
-          
-
-     
 #%%
 ## Function to obtain feature importances for different models
 def getImportantFeatures():
@@ -329,8 +333,16 @@ def perform_plot_Testing( ):
     score = clf_main.score(X_test, y_test)
 #    print('SCORE: %.2f' % (score))
     
+    y_correct = y_pred - y_test
+    
+    
+    
+    ########################
+    ## Large figure with testing plots 
+    
     columns = 4
     rows = (math.ceil( len(y_test)/columns ))
+
 
     fig, axs = plt.subplots(rows, columns, figsize=(15, rows*3) )
 
@@ -341,9 +353,10 @@ def perform_plot_Testing( ):
                 
         axs[i].bar( np.arange( num_categories ), sample )
         axs[i].set_xticks( np.arange( num_categories )  )
-        axs[i].set_xticklabels( categories , rotation=90 , fontsize=fsize, fontweight='bold'  )
+        axs[i].set_xticklabels( categories , rotation=45,ha='right' , fontsize=fsize, fontweight='bold'  )
         axs[i].set_xlabel( '' )
         axs[i].set_ylabel( 'Probability' , fontsize=fsize, fontweight='bold'  )
+        axs[i].set_ylim(0, 1)
         for bar in axs[i].patches:
             bar.set_facecolor('red')
 
@@ -355,13 +368,75 @@ def perform_plot_Testing( ):
     outputFile = exportDir + '\\testing_plots'
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
- #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-#    df.to_csv(outputFile + ".csv", index=True, sep=',')
-
     if exportEPS:
         plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        
+    
+    ########################
+    ## Plot a single inccorrect testing plot
+    
+    idx = np.where( y_correct != 0 )
+
+    if( len(idx[0]) ):
+        
+        i = idx[0][0]
+        sample = results[i]
+        
+        fig, axs = plt.subplots()
+    
+        axs.bar( np.arange( num_categories ), sample )
+        axs.set_xticks( np.arange( num_categories )  )
+        axs.set_xticklabels( categories , rotation=45,ha='right' , fontsize=fsize, fontweight='bold'  )
+        axs.set_xlabel( '' )
+        axs.set_ylabel( 'Probability' , fontsize=fsize, fontweight='bold'  )
+        axs.set_ylim(0, 1)
+        for bar in axs.patches:
+            bar.set_facecolor('red')
+    
+        axs.patches[y_test[i]-1].set_facecolor('green')
+    
+    
+        fig.tight_layout()
+        outputFile = exportDir + '\\testing_plot_incorrect'
+        plt.savefig( outputFile + ".png", dpi=dpi_all)
+        
+        if exportEPS:
+            plt.savefig( outputFile + ".eps", dpi=dpi_all)
 
 
+    ########################
+    ## Plot a single ccorrect testing plot
+    
+    idx = np.where( y_correct == 0 )
+
+    if( len(idx[0]) ):
+        
+        i = idx[0][0]
+        sample = results[i]
+        
+        fig, axs = plt.subplots()
+    
+        axs.bar( np.arange( num_categories ), sample )
+        axs.set_xticks( np.arange( num_categories )  )
+        axs.set_xticklabels( categories , rotation=45,ha='right' , fontsize=fsize, fontweight='bold'  )
+        axs.set_xlabel( '' )
+        axs.set_ylabel( 'Probability' , fontsize=fsize, fontweight='bold'  )
+        axs.set_ylim(0, 1)
+        for bar in axs.patches:
+            bar.set_facecolor('red')
+    
+        axs.patches[y_test[i]-1].set_facecolor('green')
+    
+    
+        fig.tight_layout()
+        outputFile = exportDir + '\\testing_plot_correct'
+        plt.savefig( outputFile + ".png", dpi=dpi_all)
+        
+        if exportEPS:
+            plt.savefig( outputFile + ".eps", dpi=dpi_all)
+            
+            
+    ########################
     ## Confusion matrix
     from sklearn.metrics import confusion_matrix
     
@@ -376,44 +451,16 @@ def perform_plot_Testing( ):
     outputFile = exportDir + '\\confusion_matrix_testing'
     plt.savefig( outputFile + ".png", dpi=dpi_all)
     
- #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-#    df.to_csv(outputFile + ".csv", index=True, sep=',')
-
+    
     if exportEPS:
         plt.savefig( outputFile + ".eps", dpi=dpi_all)
     
+    
+    ########################
     ## Precision and Recall 
     precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred)
-
-    plt.figure()
- 
-    index = np.arange( num_categories)
-    bar_width = 0.35
     
-    for i in range(num_categories):
-        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab20(i) )
-        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab20(i) )
-#    
-#    plt.bar( np.arange(num_categories)-w/2, recall, width=w, align='center' )
-#    plt.bar( np.arange(num_categories)+w/2, precision , width=w, align='center', color='blue', alpha=0.7 )
-    
-    plt.xticks(np.arange(num_categories)+bar_width/2, categories  , rotation=90)
-    plt.ylabel( 'Parameter Score' )
-    
-    from matplotlib.patches import Patch
-    
-    legend_elements = [ Patch(facecolor=fc, label='Precision'),
-                        Patch(facecolor=fc, alpha=0.5, label='Recall') ]
-    plt.legend(handles=legend_elements, loc='lower right')
-    
-    ax = plt.gca()
-
-#    ax.text(0.95, 1.05, ('Accuracy: %.2f' % score).lstrip('0'), size=12,
-#                bbox=dict(boxstyle='round', alpha=0.8, facecolor='white'),
-#                transform=ax.transAxes, horizontalalignment='right')
-    ax.set_title( 'Accuracy: '+str( round(score,2) ) )
-
-    plt.tight_layout()
+    plotPrecisionRecall( precision, recall, categories, score )
 
     outputFile = exportDir + '\\precision_recall_testing'
     plt.savefig( outputFile + ".png", dpi=dpi_all)
@@ -425,7 +472,7 @@ def perform_plot_Testing( ):
     df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
         
         
     if args.classifier == 'kneighbors':
@@ -500,10 +547,10 @@ def plot_confusion_matrix(cm, classes,
 
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
+#    plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=90)
+    plt.xticks(tick_marks, classes, rotation=45, ha='right')
     plt.yticks(tick_marks, classes)
 
     fmt = '.2f' if normalize else 'd'
@@ -566,7 +613,6 @@ def compare_Estimators():
         
     
 def compare_Estimators_fscore():            
-    from sklearn.metrics import precision_recall_fscore_support,accuracy_score
     from sklearn.svm import LinearSVC
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.model_selection import LeaveOneOut
@@ -610,7 +656,7 @@ def compare_Estimators_fscore():
  
                 
         axs[i].set_xticks(np.arange(num_categories)+bar_width  )
-        axs[i].set_xticklabels( categories , rotation=90   )
+        axs[i].set_xticklabels( categories , rotation=45, ha='right')
             
             
         axs[i].set_xlabel( '' )
@@ -641,7 +687,7 @@ def compare_Estimators_fscore():
     #    df.to_csv(outputFile + ".csv", index=True, sep=',')
     
     if exportEPS:
-        plt.savefig( outputFile + ".eps", dpi=dpi_all)
+        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
     
 ## Gradient boosting regularization
 ##http://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regularization.html#sphx-glr-auto-examples-ensemble-plot-gradient-boosting-regularization-py
@@ -739,7 +785,7 @@ def plot_EucledianDistance():
     plt.grid(True)
      
     plt.yticks(np.arange(n), sampleNames[0:n ], fontsize=2, rotation=0)
-    plt.xticks(np.arange(n), sampleNames[0:n ], fontsize=2, rotation=90)
+    plt.xticks(np.arange(n), sampleNames[0:n ], fontsize=2,  rotation=45,ha='right' )
     
     ax = plt.gca();
     ax.grid(color='w', linestyle='-', linewidth=0)
