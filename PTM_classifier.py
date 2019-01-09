@@ -808,7 +808,7 @@ if __name__ == "__main__":
 #    parser.add_argument( '-testing', metavar='Testing file', help="Specify path to testing dataset")
     parser.add_argument( '-output', metavar='Output directory', help="Specify output directory")
     parser.add_argument( '-loo', help="Perform leave one out analysis", action='store_true')
-    parser.add_argument( '-eucledian', help="Create eucledian distance matrix", action='store_true')
+    parser.add_argument( '-euclidean', help="Create euclidean distance matrix", action='store_true')
     parser.add_argument( '-features', help="Plot feature importance", action='store_true')
     parser.add_argument( '-all',  help="Performs all analysis included in script", action='store_true')
     parser.add_argument( '-pdf',  help="Exports all figures in PDF format for further editing", action='store_true')
