@@ -891,7 +891,7 @@ if __name__ == "__main__":
     if args.loo or args.all:
         perform_plot_LOO()
         
-    if args.eucledian or args.all:
+    if args.euclidean or args.all:
         plot_EucledianDistance()
         
     if args.features or args.all:
