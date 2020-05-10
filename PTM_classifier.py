@@ -178,10 +178,11 @@ def plotPrecisionRecall(precision, recall, categories, accuracy):
 
     plt.tight_layout()
 
+
 # Function to obtain feature importances for different models
 def getImportantFeatures():
     #K neighbors does not have a way to get most important features. This is a hacky way of getting it
-    if args.classifier == 'knn':
+    if args.classifier == 'nn':
         clf_main.fit(X_train, y_train)
         clean_dataset_score = clf_main.score(X_test, y_test)
 
@@ -199,16 +200,23 @@ def getImportantFeatures():
 
             imp_features[index] = clean_dataset_score - noisy_score
 
-    else:
+        return imp_features
+    elif args.classifier == 'gbc':
         clf_main.fit(X_train,y_train)
         imp_features = clf_main.feature_importances_ #This is a property of GBC models
-    return imp_features
+        return imp_features
+    else:
+        return None
 
 
 def featureImportance( ):
     ## Feature Importance
 
     imp_features = getImportantFeatures()
+
+    if imp_features is None:
+        print('Cannot determine feature importance for this classifier')
+        return
 
     imp_features_scaled = 100.0 * (imp_features / imp_features.max());
 
@@ -619,12 +627,13 @@ def compare_Estimators_fscore():
     classifiers = [
         (LinearSVC(random_state=RS, tol=1e-5, C=0.025)),
         (KNeighborsClassifier( 3 )),
-        (GradientBoostingClassifier(n_estimators=200, random_state=RS, learning_rate = 0.05))
+        (GradientBoostingClassifier(n_estimators=200, random_state=RS, learning_rate = 0.05)),
+        GaussianNB(),
     ]
-    names = ['Linear SVC', 'K-Nearest Neighbors', 'Gradient Boosting']
+    names = ['Linear SVC', 'K-Nearest Neighbors', 'Gradient Boosting', 'Gaussian Naive Bayes']
 
-    columns = 3
-    fig, axs = plt.subplots(1, columns, figsize=(12, 6) )
+    columns = 4
+    fig, axs = plt.subplots(1, columns, figsize=(16, 6) )
     axs = axs.ravel()
 
     loo = LeaveOneOut()
