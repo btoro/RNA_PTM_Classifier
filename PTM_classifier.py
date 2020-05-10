@@ -6,19 +6,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
+from pathlib import Path
 import pandas as pd
 
-from sklearn.ensemble import GradientBoostingClassifier  #GBM algorithm
+
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.model_selection import LeaveOneOut
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import precision_recall_fscore_support,accuracy_score
+from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
 import argparse
 
-def dataloading( TRAINING_FILE):
+CLASSIFIERS = ['gbc', 'nn', 'svm', 'nb']
+from sklearn.ensemble import GradientBoostingClassifier  #GBM algorithm
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+
+
+def dataloading(TRAINING_FILE):
     ####
     ## Training data set:
     ####
@@ -66,15 +72,12 @@ def dataloading( TRAINING_FILE):
     return X_train, y_train, categories, sampleNames, feature_labels
 
 
-#%%
-
-def perform_plot_LOO(  ):
+def perform_plot_LOO():
     #######
     ### Leave-one-samepl-out cross-validation model
     #####
 
     n_samples, n_features = X_train.shape
-
 
     y_pred = np.zeros(n_samples)
     class_probs = np.zeros([n_samples,np.unique(y_train).size]) # the probability of assigning each left out sample to each of the classes
@@ -86,10 +89,12 @@ def perform_plot_LOO(  ):
 
         clf_main.fit(X_train[train_index,:],y_train[train_index])
         y_pred[test_index] = clf_main.predict(X_train[test_index,:])
-        class_probs[test_index,:] = clf_main.predict_proba(X_train[test_index,:])
+        try:
+            class_probs[test_index,:] = clf_main.predict_proba(X_train[test_index,:])
+        except Exception:
+            pass
 
-
-#    my_score = np.mean(y_pred==y_input)
+    # my_score = np.mean(y_pred==y_input)
     precision, recall, fscore, support = precision_recall_fscore_support(y_train, y_pred)
     accuracy = accuracy_score(y_train, y_pred)
 
@@ -101,13 +106,9 @@ def perform_plot_LOO(  ):
 
     labels_train_temp = labels_train.reset_index(drop=True);
 
-
-
     labels_train_sorted = labels_train_temp[arr1inds[::-1]]
 
-
     prob_loo = class_probs[arr1inds[::-1]]
-    #plt.imshow(prob_loo, cmap=plt.cm.coolwarm, interpolation='none', extent=[0,150,0,n_samples])
     plt.imshow(prob_loo, cmap=plt.cm.coolwarm, interpolation='none', aspect='auto'  )
 
     plt.grid(True)
@@ -120,46 +121,44 @@ def perform_plot_LOO(  ):
     plt.colorbar()
     plt.tight_layout()
 
-    outputFile = exportDir + '\\{0}_class_probs_leave_one_out'.format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    outputFile = exportDir / '{0}_class_probs_leave_one_out'.format( fname )
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
-#    np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
+#    np.savetxt(Path(str(outputFile)+ ".csv"), prob_loo, delimiter=",", header=",".join(categories ))
     df = pd.DataFrame( prob_loo, index=labels_train[0:n_samples ], columns=categories )
-    df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
+    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, header=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
     ## PRECISION RECALL PLOT
     plotPrecisionRecall( precision, recall, categories, accuracy )
 
-    outputFile = exportDir + '\\{0}_precision_recall_training'.format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    outputFile = exportDir / '{0}_precision_recall_training'.format( fname )
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
 
     data = {'Precision': precision, 'Recall': recall }
     df = pd.DataFrame( data , index=categories )
-    df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
+    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, header=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
-
-
-def plotPrecisionRecall( precision, recall, categories, accuracy ):
+def plotPrecisionRecall(precision, recall, categories, accuracy):
     plt.figure()
 
-    index = np.arange( len(categories) )
+    index = np.arange(len(categories))
     bar_width = 0.35
 
     for i in range(num_categories):
-        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab20(i) )
-        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab20(i) )
-#
-#    plt.bar( np.arange(num_categories)-w/2, recall, width=w, align='center' )
-#    plt.bar( np.arange(num_categories)+w/2, precision , width=w, align='center', color='blue', alpha=0.7 )
+        plt.bar( index[i], precision[i], bar_width, alpha=1, color=plt.cm.tab20(i))
+        plt.bar( index[i]+bar_width, recall[i], bar_width, alpha=0.5, color=plt.cm.tab20(i))
+
+    # plt.bar( np.arange(num_categories)-w/2, recall, width=w, align='center' )
+    # plt.bar( np.arange(num_categories)+w/2, precision , width=w, align='center', color='blue', alpha=0.7 )
 
     plt.xticks(np.arange(num_categories)+bar_width/2, categories  , rotation=45, ha='right')
     plt.ylabel( 'Parameter Score' )
@@ -179,11 +178,10 @@ def plotPrecisionRecall( precision, recall, categories, accuracy ):
 
     plt.tight_layout()
 
-#%%
-## Function to obtain feature importances for different models
+# Function to obtain feature importances for different models
 def getImportantFeatures():
     #K neighbors does not have a way to get most important features. This is a hacky way of getting it
-    if args.classifier == 'kneighbors':
+    if args.classifier == 'knn':
         clf_main.fit(X_train, y_train)
         clean_dataset_score = clf_main.score(X_test, y_test)
 
@@ -197,7 +195,7 @@ def getImportantFeatures():
             np.random.shuffle(X_test_noisy[:, index])
             clf_main.fit(X_train_noisy, y_train)
             noisy_score = clf_main.score(X_test_noisy, y_test)
-#            print(clean_dataset_score - noisy_score, clean_dataset_score, noisy_score)
+    #            print(clean_dataset_score - noisy_score, clean_dataset_score, noisy_score)
 
             imp_features[index] = clean_dataset_score - noisy_score
 
@@ -225,20 +223,20 @@ def featureImportance( ):
 
     df2.plot(kind='barh', colormap='jet', legend=False)
 
-    outputFile = exportDir + '\\{0}_feature_importance_training'.format( fname )
+    outputFile = exportDir / '{0}_feature_importance_training'.format( fname )
 
     plt.tight_layout()
 
     plt.xlabel('Relative Importance')
     plt.ylabel('')
 
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
-#    np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-    df.to_csv(outputFile + ".csv", index=True, sep=',')
+    #    np.savetxt(Path(str(outputFile)+ ".csv"), prob_loo, delimiter=",", header=",".join(categories ))
+    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
     ## Two most important Features
     if len(imp_features) > 2:
@@ -267,14 +265,14 @@ def featureImportance( ):
 
         plt.legend(handles=legend_elements, loc='best')
 
-        outputFile = exportDir + '\\{0}_firstsec_features_training'.format( fname )
-        plt.savefig( outputFile + ".png", dpi=dpi_all)
+        outputFile = exportDir / '{0}_firstsec_features_training'.format( fname )
+        plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
- #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-    #    df.to_csv(outputFile + ".csv", index=True, sep=',')
+ #       np.savetxt(Path(str(outputFile)+ ".csv"), prob_loo, delimiter=",", header=",".join(categories ))
+    #    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, sep=',')
 
         if exportPDF:
-            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+            plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
     ## Three most important Features
@@ -307,19 +305,19 @@ def featureImportance( ):
 
         plt.legend(handles=legend_elements, loc='best')
 
-        outputFile = exportDir + '\\{0}_firstsecthird_features_training'.format( fname )
-        plt.savefig( outputFile + ".png", dpi=dpi_all)
+        outputFile = exportDir / '{0}_firstsecthird_features_training'.format( fname )
+        plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
- #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-    #    df.to_csv(outputFile + ".csv", index=True, sep=',')
+ #       np.savetxt(Path(str(outputFile)+ ".csv"), prob_loo, delimiter=",", header=",".join(categories ))
+    #    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, sep=',')
 
         if exportPDF:
-            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+            plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
-#%%
-###
-## Test the model
+    #%%
+    ###
+    ## Test the model
 def perform_plot_Testing( ):
     import math
 
@@ -331,7 +329,7 @@ def perform_plot_Testing( ):
     results = clf_main.predict_proba(X_test)
 
     score = clf_main.score(X_test, y_test)
-#    print('SCORE: %.2f' % (score))
+    #    print('SCORE: %.2f' % (score))
 
     y_correct = y_pred - y_test
 
@@ -365,11 +363,11 @@ def perform_plot_Testing( ):
 
 
     fig.tight_layout()
-    outputFile = exportDir + '\\{0}_testing_plots'.format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    outputFile = exportDir / '{0}_testing_plots'.format( fname )
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
     ########################
@@ -397,11 +395,11 @@ def perform_plot_Testing( ):
 
 
         fig.tight_layout()
-        outputFile = exportDir + '\\{0}_testing_plot_incorrect'.format( fname )
-        plt.savefig( outputFile + ".png", dpi=dpi_all)
+        outputFile = exportDir / '{0}_testing_plot_incorrect'.format( fname )
+        plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
         if exportPDF:
-            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+            plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
     ########################
@@ -429,11 +427,11 @@ def perform_plot_Testing( ):
 
 
         fig.tight_layout()
-        outputFile = exportDir + '\\{0}_testing_plot_correct'.format( fname )
-        plt.savefig( outputFile + ".png", dpi=dpi_all)
+        outputFile = exportDir /  '{0}_testing_plot_correct'.format( fname )
+        plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
         if exportPDF:
-            plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+            plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
     ########################
@@ -448,12 +446,12 @@ def perform_plot_Testing( ):
     plt.figure(figsize=(15,8))
     plot_confusion_matrix(cnf_matrix, normalize=True, classes=categories)
 
-    outputFile = exportDir + '\\{0}_confusion_matrix_testing'.format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    outputFile = exportDir / '{0}_confusion_matrix_testing'.format( fname )
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
     ########################
@@ -462,20 +460,20 @@ def perform_plot_Testing( ):
 
     plotPrecisionRecall( precision, recall, categories, score )
 
-    outputFile = exportDir + '\\{0}_precision_recall_testing'.format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    outputFile = exportDir / '{0}_precision_recall_testing'.format( fname )
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
 
 
     data = {'Precision': precision, 'Recall': recall }
     df = pd.DataFrame( data , index=categories )
-    df.to_csv(outputFile + ".csv", index=True, header=True, sep=',')
+    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, header=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
-    if args.classifier == 'kneighbors':
+    if args.classifier == 'knn':
         ### Plot 2nd 3rd features, test and train sets
         imp_features = getImportantFeatures()
 
@@ -521,11 +519,11 @@ def perform_plot_Testing( ):
             plt.legend(handles=legend_elements, loc='best')
 
 
-            outputFile = exportDir + '\\{0}_firstsec_features_testing'.format( fname )
-            plt.savefig( outputFile + ".png", dpi=dpi_all)
+            outputFile = exportDir /  '{0}_firstsec_features_testing'.format( fname )
+            plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
             if exportPDF:
-                plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+                plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
 
@@ -541,13 +539,13 @@ def plot_confusion_matrix(cm, classes,
     """
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-#        print("Normalized confusion matrix")
-#    else:
-#        print('Confusion matrix, without normalization')
+    #        print("Normalized confusion matrix")
+    #    else:
+    #        print('Confusion matrix, without normalization')
 
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-#    plt.title(title)
+    #    plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45, ha='right')
@@ -603,13 +601,13 @@ def compare_Estimators():
     outputFile = '{0}_compare_classifiers_accuracy'.format( fname )
 
 
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
-     #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-    #    df.to_csv(outputFile + ".csv", index=True, sep=',')
+     #       np.savetxt(Path(str(outputFile)+ ".csv"), prob_loo, delimiter=",", header=",".join(categories ))
+    #    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 
 def compare_Estimators_fscore():
@@ -621,8 +619,8 @@ def compare_Estimators_fscore():
     classifiers = [
         (LinearSVC(random_state=RS, tol=1e-5, C=0.025)),
         (KNeighborsClassifier( 3 )),
-        (GradientBoostingClassifier(n_estimators=200, random_state=RS, learning_rate = 0.05))]
-
+        (GradientBoostingClassifier(n_estimators=200, random_state=RS, learning_rate = 0.05))
+    ]
     names = ['Linear SVC', 'K-Nearest Neighbors', 'Gradient Boosting']
 
     columns = 3
@@ -630,6 +628,9 @@ def compare_Estimators_fscore():
     axs = axs.ravel()
 
     loo = LeaveOneOut()
+
+
+    outputFile = exportDir /  '{0}_compare_classifiers'.format( fname )
 
     # iterate over classifiers
     for i, clf in enumerate(classifiers):
@@ -664,9 +665,6 @@ def compare_Estimators_fscore():
 
         axs[i].set_title( names[i]+ r"$\bf{" + ' | Accuracy: '+ str( round(accuracy,2) ) + "}$" )
 
-
-
-
         plt.tight_layout()
 
         from matplotlib.patches import Patch
@@ -675,98 +673,20 @@ def compare_Estimators_fscore():
                             Patch(facecolor=fc, alpha=0.6, label='Recall'), ]
                             #Patch(facecolor=fc, alpha=0.25, label='F-score', hatch="//") ]
         plt.legend(handles=legend_elements, loc='lower right')
+        
+        df = pd.DataFrame([precision, recall], columns = categories, index=['Precision', 'Recall']).transpose()
+        df.to_csv(Path(str(outputFile)+ names[i] + ".csv"), index=True, header=True, sep=',')
 
 
-    outputFile = exportDir + '\\{0}_compare_classifiers'.format( fname )
 
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
-
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
-
-     #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-    #    df.to_csv(outputFile + ".csv", index=True, sep=',')
-
-    if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
-
-## Gradient boosting regularization
-##http://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regularization.html#sphx-glr-auto-examples-ensemble-plot-gradient-boosting-regularization-py
-def perform_Regularization( ):
-    plt.figure(figsize=(12, 6))
-
-
-    original_params = {'n_estimators': 500, 'max_leaf_nodes': 4, 'max_depth': None, 'random_state': 2,
-                   'min_samples_split': 5}
-
-    for label, color, setting in [('No shrinkage', 'orange',
-                                   {'learning_rate': 1.0, 'subsample': 1.0}),
-                                  ('learning_rate=0.1', 'turquoise',
-                                   {'learning_rate': 0.1, 'subsample': 1.0}),
-#                                  ('subsample=0.5', 'blue',
-#                                   {'learning_rate': 1.0, 'subsample': 0.5}),
-                                  ('learning_rate=0.1, subsample=0.5', 'gray',
-                                   {'learning_rate': 0.1, 'subsample': 0.5}),
-                                  ('learning_rate=0.1, max_features=2', 'magenta',
-                                   {'learning_rate': 0.1, 'max_features': 2}),
-                                   ('learning_rate=0.05', 'red',
-                                   {'learning_rate': 0.05, 'max_leaf_nodes': None, 'min_samples_split': 2 })]:
-        params = dict(original_params)
-        params.update(setting)
-
-        clf = GradientBoostingClassifier(**params)
-        clf.fit(X_train, y_train)
-
-        # compute test set deviance
-        test_deviance = np.zeros((params['n_estimators'],), dtype=np.float64)
-
-
-        for i, y_pred in enumerate(clf.staged_decision_function(X_test)):
-            test_deviance[i] = clf.loss_(y_test, y_pred)
-
-#        train_deviance = clf.train_score_
-
-        plt.plot((np.arange(test_deviance.shape[0]) + 1)[::5], test_deviance[::5],
-                '-', color=color, label=label)
-
-    plt.legend(loc='upper left')
-    plt.xlabel('Boosting Iterations')
-    plt.ylabel('Test Set Deviance')
-
-    outputFile = exportDir + '\\{0}_training_deviance'.format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
-
- #       np.savetxt(outputFile + ".csv", prob_loo, delimiter=",", header=",".join(categories ))
-#    df.to_csv(outputFile + ".csv", index=True, sep=',')
+     #       np.savetxt(Path(str(outputFile)+ ".csv"), prob_loo, delimiter=",", header=",".join(categories ))
+    #    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
-#    fig = plt.figure()
-#
-#    X_test=np.asmatrix(X_test)
-#
-#    y_pred = clf.predict(X_test)
-#    results = clf.predict_proba(X_test)
-#
-#    for idx, sample in enumerate(results):
-#        fig = plt.figure()
-#
-#        predictedCategory = categories[y_pred[idx]-1]
-#
-#        plt.bar( np.arange(7), sample )
-#        plt.xticks(np.arange(7), categories,  rotation=90)
-#
-#        plt.xlabel( 'Categories' )
-#        plt.ylabel( 'Probability' )
-#
-#        if( y_pred[idx] != Y_test_true[idx] ):
-#            plt.title( 'Predicted: '+predictedCategory+'. Actual: '+categories[Y_test_true[idx]-1], color='red'  )
-#        else:
-#            plt.title( 'Predicted: '+predictedCategory+'. Actual: '+categories[Y_test_true[idx]-1], color='green'  )
-#
-#
-#        plt.show
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
-#%%
 
 ##########
 ## Eucledian Distance Calculation & Plot
@@ -791,14 +711,14 @@ def plot_EucledianDistance():
     ax.grid(color='w', linestyle='-', linewidth=0)
     plt.colorbar()
 
-    outputFile = exportDir + "\\{0}_eucledian_distances".format( fname )
-    plt.savefig( outputFile + ".png", dpi=dpi_all)
+    outputFile = exportDir / "{0}_eucledian_distances".format( fname )
+    plt.savefig(Path(str(outputFile)+ ".png"), dpi=dpi_all)
 
     df = pd.DataFrame( results , index=sampleNames , columns=sampleNames)
-    df.to_csv(outputFile + ".csv", index=True, sep=',')
+    df.to_csv(Path(str(outputFile)+ ".csv"), index=True, sep=',')
 
     if exportPDF:
-        plt.savefig( outputFile + ".pdf", dpi=dpi_all)
+        plt.savefig(Path(str(outputFile)+ ".pdf"), dpi=dpi_all)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RNA PTM Classifer script')
@@ -816,7 +736,7 @@ if __name__ == "__main__":
     parser.add_argument( '-random_test',  type= float, help="Select random samples for testing ", required=True)
     parser.add_argument( '-random_state',  type=int, help="Select a random seed for reproducibility")
     parser.add_argument( '-compare_classifiers',  help="Compares some basic classification estimators", action='store_true')
-    parser.add_argument( '-classifier',  help="Select classifier to use")
+    parser.add_argument( '-classifier',  help="Select classifier to use", choices=CLASSIFIERS)
     parser.add_argument( '-test',  help="Perform testing", action='store_true')
     parser.add_argument( '-blk',  help="Exports figures with black background color scheme", action='store_true')
 
@@ -825,11 +745,7 @@ if __name__ == "__main__":
 
 
     ### Deals with the output for all files
-    if args.output:
-        exportDir = os.getcwd() + '//' + args.output
-    else:
-        exportDir = os.getcwd()
-
+    exportDir = Path(args.output)
     print("Will export all outputs to %s." % exportDir)
 
 
@@ -842,7 +758,7 @@ if __name__ == "__main__":
 
     runcmd = " ".join(sys.argv)
 
-    file = open( exportDir+ "//command.txt","w")
+    file = open( exportDir / "command.txt","w")
     file.write( runcmd   )
     file.close()
 
@@ -881,12 +797,16 @@ if __name__ == "__main__":
         fc = 'white'
 
     ## Pick classifier
-    if args.classifier == 'gradient':
+    if args.classifier == 'gbc':
         params = {'n_estimators': 300, 'learning_rate': 0.05, 'random_state': RS}
         clf_main = GradientBoostingClassifier( **params )
-    elif args.classifier == 'kneighbors':
+    elif args.classifier == 'nn':
         n_neighbors=3
         clf_main = KNeighborsClassifier( n_neighbors )
+    elif args.classifier == 'svm':
+        clf_main = SVC(random_state=RS, tol=1e-5, C=0.025)
+    elif args.classifier == 'nb':
+        clf_main = GaussianNB()
 
     if args.loo or args.all:
         perform_plot_LOO()

@@ -53,11 +53,11 @@ python PTM_classifier.py -training example_data.csv -random_test 0.1
 ### Classifier comparison
 
 Compares common estimators used for classification:
-- LinearSVM
+- LinearSVC
 - KNeighbors
 - GradientBoosting
 
-Leave one out cross validation is used. 
+Leave one out cross validation is used.
 
 ```
 
@@ -69,8 +69,10 @@ python PTM_classifier.py -training example_data.csv -compare_classifiers
 
 
 **-classifier options**
-- gradient
-- kneighbors
+- LinearSVC - svc
+- Nearest Neighbors - nn
+- Gradient Boosting Classifier - gbc
+- Gaussian Naive Bayes - nb
 
 This alone will not do anything. It will just set the classifier.
 
